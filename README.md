@@ -45,6 +45,34 @@ The library and its applications, compiles/runs on Windows, Linux and Mac operat
 1. `cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake -D CMAKE_MAKE_PROGRAM=make -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_CXX_FLAGS="-fPIC"`
 2. `cmake --build build`
 
+#### Emscripten -> mdflib only.
+1. `emcmake cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake -D MDF_BUILD_SHARED_LIB=OFF -D CMAKE_MAKE_PROGRAM=make -D CMAKE_CXX_COMPILER=emcc`
+2. `cmake --build build`
+
+#### Emscripten -> mdflib + mdflibjs
+1. `emcmake cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake -D MDF_BUILD_SHARED_LIB=OFF -D MDF_BUILD_JS=ON -DVCPKG_TARGET_TRIPLET=emscripten -DVCPKG_OVERLAY_TRIPLETS=/workspaces/mdflib/mdflibjs/triplets -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=/usr/local/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake`
+2. `cmake --build build`
+
+##### Testing Emscripten
+1. Copy `/workspaces/mdflib/build/mdflibjs/mdflibjs.js` and `/workspaces/mdflib/build/mdflibjs/mdflibjs.wasm` to some other folder.
+2. Create an html file with the following contents:
+
+    ```html
+    <!doctype html>
+    <html>
+    <script>
+        var Module = {
+        onRuntimeInitialized: function() {
+            console.log('add result: ' + Module.add(1, 2));
+        }
+        };
+    </script>
+    <script src="mdflibjs.js"></script>
+    </html>
+    ```
+3. cd into the directory and run a Python web server `python3 -m http.server`
+4. Open the browser, open the console log developer tools and see the result there.
+
 ### Without Devcontainer
 
 The project uses CMAKE for building. But mdflibrary_test_net is a Visual Studio build.

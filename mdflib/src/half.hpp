@@ -147,7 +147,11 @@
 #define HALF_ENABLE_CPP11_HASH 1
 #endif
 #ifndef HALF_ENABLE_CPP11_CFENV
+#ifdef __EMSCRIPTEN__
+#define HALF_ENABLE_CPP11_CFENV 0
+#else
 #define HALF_ENABLE_CPP11_CFENV 1
+#endif
 #endif
 #endif
 #elif defined(__GLIBCXX__)  // libstdc++
