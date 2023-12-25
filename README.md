@@ -23,6 +23,30 @@ The library and its applications, compiles/runs on Windows, Linux and Mac operat
 
 ## Building
 
+### With Devcontainer
+1. Open the folder in VSCode
+2. Reopen in Devcontainer
+3. Use one of the steps below depending on what you're building. If you change what you want to build, delete the build folder with
+`rm -rf build` before you run any command or just use different `build` folders for each of them.
+
+#### GCC -> mdflib only.
+1. `cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake -D MDF_BUILD_SHARED_LIB=OFF -D CMAKE_MAKE_PROGRAM=make -D CMAKE_CXX_COMPILER=g++`
+2. `cmake --build build`
+
+#### GCC -> mdflib + mdflibrary.
+1. `cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake -D CMAKE_MAKE_PROGRAM=make -D CMAKE_CXX_COMPILER=g++`
+2. `cmake --build build`
+
+#### Clang -> mdflib only.
+1. `cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake -D MDF_BUILD_SHARED_LIB=OFF CMAKE_MAKE_PROGRAM=make -D CMAKE_CXX_COMPILER=clang++`
+2. `cmake --build build`
+
+#### Clang -> mdflib + mdflibrary.
+1. `cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake -D CMAKE_MAKE_PROGRAM=make -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_CXX_FLAGS="-fPIC"`
+2. `cmake --build build`
+
+### Without Devcontainer
+
 The project uses CMAKE for building. But mdflibrary_test_net is a Visual Studio build.
 
 The following third-party libraries are used and needs to be downloaded and pre-built.
@@ -35,6 +59,11 @@ The following third-party libraries are used and needs to be downloaded and pre-
 - Doxygen's application. Is required if the documentation should be built.
 
 Also, you can use [vcpkg](https://github.com/microsoft/vcpkg) to import the dependencies.
+
+## Testing
+
+1. Make sure you set `-D MDF_BUILD_TEST=ON`
+2. cd build && ctest -C && cd ..
 
 ## License
 
