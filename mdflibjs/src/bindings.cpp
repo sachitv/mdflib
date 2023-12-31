@@ -146,7 +146,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
       .function(
           "getTreeList",
           select_overload<const std::vector<ETag>&() const>(&ETag::TreeList));
-  register_vector<mdf::ETag>("std::vector<ETag>");
+  register_vector<mdf::ETag>("ETagVector");
 
   class_<MetadataWrapped>("Metadata")
       .function("getPropertyAsString", &MetadataWrapped::GetPropertyAsString)
@@ -160,7 +160,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
       .function("getProperties", &MetadataWrapped::GetProperties)
       .function("getXmlSnippet", &MetadataWrapped::GetXmlSnippet)
       .function("setXmlSnippet", &MetadataWrapped::SetXmlSnippet);
-  register_vector<MetadataWrapped>("std::vector<Metadata>");
+  register_vector<MetadataWrapped>("MetadataVector");
 
   class_<AttachmentWrapped>("Attachment")
       .function("getIndex", &AttachmentWrapped::GetIndex)
@@ -177,7 +177,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
       .function("setFileType", &AttachmentWrapped::SetFileType)
       .function("getMetaData", &AttachmentWrapped::GetMetaData)
       .function("createMetaData", &AttachmentWrapped::CreateMetaData);
-  register_vector<AttachmentWrapped>("std::vector<Attachment>");
+  register_vector<AttachmentWrapped>("AttachmentVector");
 
   enum_<EventType>("EventType")
       .value("RecordingPeriod", EventType::RecordingPeriod)
@@ -238,7 +238,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
       .function("setPostTrig", &EventWrapped::SetPostTrig)
       .function("getMetaData", &EventWrapped::GetMetaData)
       .function("addAttachment", &EventWrapped::AddAttachment);
-  register_vector<EventWrapped>("std::vector<Event>");
+  register_vector<EventWrapped>("EventVector");
 
   enum_<SourceType>("SourceType")
       .value("Other", SourceType::Other)
@@ -277,7 +277,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
       .function("setFlags", &SourceInformationWrapped::SetFlags)
       .function("getMetaData", &SourceInformationWrapped::GetMetaData)
       .function("createMetaData", &SourceInformationWrapped::CreateMetaData);
-  register_vector<SourceInformationWrapped>("std::vector<SourceInformation>");
+  register_vector<SourceInformationWrapped>("SourceInformationVector");
 
   enum_<ConversionType>("ConversionType")
       .value("NoConversion", ConversionType::NoConversion)
@@ -333,7 +333,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
                     &ChannelConversionWrapped::SetParameter))
       .function("createInverse", &ChannelConversionWrapped::CreateInverse);
 
-  register_vector<ChannelConversionWrapped>("std::vector<ChannelConversion>");
+  register_vector<ChannelConversionWrapped>("ChannelConversionVector");
 
   enum_<ChannelType>("ChannelType")
       .value("FixedLength", ChannelType::FixedLength)
@@ -456,7 +456,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
                 select_overload<void(std::vector<uint8_t>, bool)>(
                     &ChannelWrapped::SetChannelValue));
 
-  register_vector<ChannelWrapped>("std::vector<Channel>");
+  register_vector<ChannelWrapped>("ChannelVector");
 
   constant("CgFlag_VlsdChannel", mdf::CgFlag::VlsdChannel);
   constant("CgFlag_BusEvent", mdf::CgFlag::BusEvent);
@@ -487,7 +487,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
       .function("createSourceInformation",
                 &ChannelGroupWrapped::CreateSourceInformation);
 
-  register_vector<ChannelGroupWrapped>("std::vector<ChannelGroup>");
+  register_vector<ChannelGroupWrapped>("ChannelGroupVector");
 
   class_<DataGroupWrapped>("DataGroup")
       .function("getIndex", &DataGroupWrapped::GetIndex)
@@ -502,50 +502,50 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
                 &DataGroupWrapped::FindParentChannelGroup)
       .function("resetSample", &DataGroupWrapped::ResetSample);
 
-  register_vector<DataGroupWrapped>("std::vector<DataGroup>");
+  register_vector<DataGroupWrapped>("DataGroupVector");
 
   class_<ChannelObserverWrapped>("ChannelObserver")
       .constructor<DataGroupWrapped, ChannelGroupWrapped, ChannelWrapped>()
       .constructor<DataGroupWrapped, const std::string&>()
-      .function("GetNofSamples", &ChannelObserverWrapped::GetNofSamples)
-      .function("GetName", &ChannelObserverWrapped::GetName)
-      .function("GetUnit", &ChannelObserverWrapped::GetUnit)
-      .function("GetChannel", &ChannelObserverWrapped::GetChannel)
-      .function("IsMaster", &ChannelObserverWrapped::IsMaster)
-      .function("HasChannelValueInt64",
+      .function("getNofSamples", &ChannelObserverWrapped::GetNofSamples)
+      .function("getName", &ChannelObserverWrapped::GetName)
+      .function("getUnit", &ChannelObserverWrapped::GetUnit)
+      .function("getChannel", &ChannelObserverWrapped::GetChannel)
+      .function("isMaster", &ChannelObserverWrapped::IsMaster)
+      .function("hasChannelValueInt64",
                 &ChannelObserverWrapped::HasChannelValueInt64)
       .function("hasChannelValueUint64",
                 &ChannelObserverWrapped::hasChannelValueUint64)
-      .function("HasChannelValueDouble",
+      .function("hasChannelValueDouble",
                 &ChannelObserverWrapped::HasChannelValueDouble)
-      .function("HasChannelValueString",
+      .function("hasChannelValueString",
                 &ChannelObserverWrapped::HasChannelValueString)
-      .function("HasChannelValueUint8Vector",
+      .function("hasChannelValueUint8Vector",
                 &ChannelObserverWrapped::HasChannelValueUint8Vector)
-      .function("HasEngValueUint64", &ChannelObserverWrapped::HasEngValueUint64)
-      .function("HasEngValueInt64", &ChannelObserverWrapped::HasEngValueInt64)
-      .function("HasEngValueDouble", &ChannelObserverWrapped::HasEngValueDouble)
-      .function("HasEngValueString", &ChannelObserverWrapped::HasEngValueString)
-      .function("HasEngValueUint8Vector",
+      .function("hasEngValueUint64", &ChannelObserverWrapped::HasEngValueUint64)
+      .function("hasEngValueInt64", &ChannelObserverWrapped::HasEngValueInt64)
+      .function("hasEngValueDouble", &ChannelObserverWrapped::HasEngValueDouble)
+      .function("hasEngValueString", &ChannelObserverWrapped::HasEngValueString)
+      .function("hasEngValueUint8Vector",
                 &ChannelObserverWrapped::HasEngValueUint8Vector)
-      .function("GetChannelValueInt64",
+      .function("getChannelValueInt64",
                 &ChannelObserverWrapped::GetChannelValueInt64)
-      .function("GetChannelValueUint64",
+      .function("getChannelValueUint64",
                 &ChannelObserverWrapped::GetChannelValueUint64)
-      .function("GetChannelValueDouble",
+      .function("getChannelValueDouble",
                 &ChannelObserverWrapped::GetChannelValueDouble)
-      .function("GetChannelValueString",
+      .function("getChannelValueString",
                 &ChannelObserverWrapped::GetChannelValueString)
-      .function("GetChannelValueUint8Vector",
+      .function("getChannelValueUint8Vector",
                 &ChannelObserverWrapped::GetChannelValueUint8Vector)
-      .function("GetEngValueInt64", &ChannelObserverWrapped::GetEngValueInt64)
-      .function("GetEngValueUint64", &ChannelObserverWrapped::GetEngValueUint64)
-      .function("GetEngValueDouble", &ChannelObserverWrapped::GetEngValueDouble)
-      .function("GetEngValueString", &ChannelObserverWrapped::GetEngValueString)
-      .function("GetEngValueUint8Vector",
+      .function("getEngValueInt64", &ChannelObserverWrapped::GetEngValueInt64)
+      .function("getEngValueUint64", &ChannelObserverWrapped::GetEngValueUint64)
+      .function("getEngValueDouble", &ChannelObserverWrapped::GetEngValueDouble)
+      .function("getEngValueString", &ChannelObserverWrapped::GetEngValueString)
+      .function("getEngValueUint8Vector",
                 &ChannelObserverWrapped::GetEngValueUint8Vector);
 
-  register_vector<ChannelObserverWrapped>("std::vector<ChannelObserver>");
+  register_vector<ChannelObserverWrapped>("ChannelObserverVector");
   function("createChannelObserverForChannelGroup",
            &CreateChannelObserverForChannelGroup);
 
@@ -564,7 +564,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
       .function("setToolVersion", &FileHistoryWrapped::SetToolVersion)
       .function("getUserName", &FileHistoryWrapped::GetUserName)
       .function("setUserName", &FileHistoryWrapped::SetUserName);
-  register_vector<FileHistoryWrapped>("std::vector<FileHistory>");
+  register_vector<FileHistoryWrapped>("FileHistoryVector");
 
   class_<HeaderWrapped>("Header")
       .function("getIndex", &HeaderWrapped::GetIndex)

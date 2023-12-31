@@ -1,18 +1,19 @@
 <!doctype html>
 <html>
-  <script>
-    var Module = {
-      onRuntimeInitialized: function() {
-        let etag = new Module.ETag();
-        etag.setName("Sachit");
-        let another_etag = new Module.ETag();
-        another_etag.setName("Inside");
-        etag.addTag(another_etag);
-        tree = etag.getTreeList();
-        for(let i = 0; i < tree.size(); ++i) {
-            console.log(tree.get(i).getName());
-        }
+<script>
+  var Module = {
+    onRuntimeInitialized: function () {
+      let etag = new Module.ETag();
+      etag.setName("Sachit");
+      let another_etag = new Module.ETag();
+      another_etag.setName("Inside");
+      etag.addTag(another_etag);
+      tree = etag.getTreeList();
+      for (let i = 0; i < tree.size(); ++i) {
+        console.log(tree.get(i).getName());
+      }
 
+      WriteOperation = () => {
         const Writer = new Module.Writer(Module.MdfWriterType.Mdf4Basic, "test_cpp.mf4");
         const Header = Writer.getHeader();
         Header.setAuthor("Caller");
@@ -42,7 +43,7 @@
         si.setType(Module.SourceType.Bus);
         si.setBus(Module.BusType.Can);
 
-      
+
         let cn = cg.createChannel();
         cn.setName("Time");
         cn.setDescription("Time channel");
@@ -99,7 +100,7 @@
         console.log("ChannelGroupGetChannels: " + channels.size());
         Writer.initMeasurement();
         Writer.startMeasurement(BigInt(100000000));
-        
+
         console.log("Start measure");
         for (let i = 0; i < 50; i++) {
           channels.get(1).setChannelValueUint64(BigInt(i * 2), true);
@@ -108,9 +109,9 @@
           channels.get(4).setChannelValueUint64(BigInt(i * 5), true);
           channels.get(5).setChannelValueString(String(i * 6), true);
 
-          const bytesToWrite = String(i*6);
+          const bytesToWrite = String(i * 6);
           const vectorToWrite = new Module.Uint8Vector();
-          for(letter of bytesToWrite) {
+          for (letter of bytesToWrite) {
             vectorToWrite.push_back(6);
           }
 
@@ -121,8 +122,161 @@
         console.log("Stop measure");
         Writer.stopMeasurement(BigInt(1100000000));
         Writer.finalizeMeasurement();
+      }
+
+      ReadOperation = () => {
+        console.log("Read");
+        const Reader = new Module.Reader("test_cpp.mf4");
+        Reader.readEverythingButData();
+        const Header = Reader.getHeader();
+        console.log("Author: " + Header.getAuthor());
+        console.log("Department: " + Header.getDepartment());
+        console.log("Description: " + Header.getDescription());
+        console.log("Project: " + Header.getProject());
+        console.log("StartTime: " + Header.getStartTime());
+        console.log("Subject: " + Header.getSubject());
+
+        const Historys = Header.getFileHistorys();
+        for (let i = 0; i < Historys.size(); i++) {
+          const History = Historys.get(i);
+          console.log("Time: " + History.getTime());
+          console.log("Description: " + History.getDescription());
+          console.log("ToolName: " + History.getToolName());
+          console.log("ToolVendor: " + History.getToolVendor());
+          console.log("ToolVersion: " + History.getToolVersion());
+          console.log("UserName: " + History.getUserName());
+          console.log("");
+        }
+
+        const DataGroups = Header.getDataGroups();
+        console.log("DataGroups: " + DataGroups.size());
+        for (let i = 0; i < DataGroups.size(); i++) {
+          const DataGroup = DataGroups.get(i);
+          const ChannelGroups = DataGroup.getChannelGroups();
+          console.log("ChannelGroups: " + ChannelGroups.size());
+          for (let j = 0; j < ChannelGroups.size(); j++) {
+            const ChannelGroup = ChannelGroups.get(j);
+            console.log("Name: " + ChannelGroup.getName());
+            console.log("Description: " + ChannelGroup.getDescription());
+
+            const SourceInformation = ChannelGroup.getSourceInformation();
+            console.log("SI Name: " + SourceInformation.getName());
+            console.log("SI Path: " + SourceInformation.getPath());
+            console.log("SI Description: " + SourceInformation.getType());
+            console.log("Nof Samples: " + ChannelGroup.getNofSamples());
+
+            const Channels = ChannelGroup.getChannels();
+            console.log("Channels: " + Channels.size());
+            const Observers = new Module.ChannelObserverVector();
+            for (let j = 0; j < Channels.size(); j++) {
+              const Channel = Channels.get(j);
+              console.log("Name: " + Channel.getName());
+              console.log("Description: " + Channel.getDescription());
+              console.log("Type: " + Channel.getType());
+              console.log("Sync: " + Channel.getSync());
+              console.log("DataType: " + Channel.getDataType());
+              console.log("DataBytes: " + Channel.getDataBytes());
+              console.log("Unit: " + Channel.getUnit());
+              console.log("");
+
+              Observers.push_back(
+                new Module.ChannelObserver(DataGroup, ChannelGroup, Channel));
+            }
+
+            Reader.readData(DataGroup);
+
+            for (let j = 0; j < ChannelGroup.getNofSamples(); j++) {
+              console.log("Sample: " + j);
+              for (let k = 0; k < Observers.size(); k++) {
+                const Observer = Observers.get(k);
+                switch (Observer.getChannel().getDataType()) {
+                  case Module.ChannelDataType.CanOpenDate:
+                  case Module.ChannelDataType.CanOpenTime:
+                  case Module.ChannelDataType.UnsignedIntegerLe:
+                  case Module.ChannelDataType.UnsignedIntegerBe: {
+                    let channel_value = null;
+                    let eng_value = null;
+                    if (Observer.hasChannelValueUint64(BigInt(j))) {
+                      channel_value = Observer.getChannelValueUint64(BigInt(j));
+                    }
+                    if (Observer.hasEngValueUint64(BigInt(j))) {
+                      eng_value = Observer.getEngValueUint64(BigInt(j));
+                    }
+                    console.log("Channel: " + channel_value + ", Eng: " + eng_value);
+                    break;
+                  }
+                  case Module.ChannelDataType.SignedIntegerLe:
+                  case Module.ChannelDataType.SignedIntegerBe: {
+                    let channel_value = null;
+                    let eng_value = null;
+                    if (Observer.hasChannelValueInt64(BigInt(j))) {
+                      channel_value = Observer.getChannelValueInt64(BigInt(j));
+                    }
+                    if (Observer.hasEngValueInt64(BigInt(j))) {
+                      eng_value = Observer.getEngValueInt64(BigInt(j));
+                    }
+                    console.log("Channel: " + channel_value + ", Eng: " + eng_value);
+                    break;
+                  }
+                  case Module.ChannelDataType.FloatLe:
+                  case Module.ChannelDataType.FloatBe: {
+                    let channel_value = null;
+                    let eng_value = null;
+                    if (Observer.hasChannelValueDouble(BigInt(j))) {
+                      channel_value = Observer.getChannelValueDouble(BigInt(j));
+                    }
+                    if (Observer.hasEngValueDouble(BigInt(j))) {
+                      eng_value = Observer.getEngValueDouble(BigInt(j));
+                    }
+                    console.log("Channel: " + channel_value + ", Eng: " + eng_value);
+                    break;
+                  }
+                  case Module.ChannelDataType.StringAscii:
+                  case Module.ChannelDataType.StringUTF8:
+                  case Module.ChannelDataType.StringUTF16Le:
+                  case Module.ChannelDataType.StringUTF16Be: {
+                    let channel_value = null;
+                    let eng_value = null;
+                    if (Observer.hasChannelValueString(BigInt(j))) {
+                      channel_value = Observer.getChannelValueString(BigInt(j));
+                    }
+                    if (Observer.hasEngValueString(BigInt(j))) {
+                      eng_value = Observer.getEngValueString(BigInt(j));
+                    }
+                    console.log("Channel: " + channel_value + ", Eng: " + eng_value);
+                    break;
+                  }
+                  case Module.ChannelDataType.MimeStream:
+                  case Module.ChannelDataType.MimeSample:
+                  case Module.ChannelDataType.ByteArray: {
+                    let channel_value = null;
+                    let eng_value = null;
+                    if (Observer.hasChannelValueUint8Vector(BigInt(j))) {
+                      channel_value = Observer.getChannelValueUint8Vector(BigInt(j));
+                    }
+                    if (Observer.hasEngValueUint8Vector(BigInt(j))) {
+                      eng_value = Observer.getEngValueUint8Vector(BigInt(j));
+                    }
+                    console.log("Channel: " + channel_value.size() + ", Eng: " + eng_value.size());
+                    break;
+                  }
+                  default:
+                    break;
+                }
+              }
+              console.log("");
+            }
+            console.log("");
+          }
+          console.log("");
+        }
+      }
+
+      WriteOperation();
+      ReadOperation();
     }
   }
-  </script>
-  <script src="mdflibjs.js"></script>
+</script>
+<script src="mdflibjs.js"></script>
+
 </html>
