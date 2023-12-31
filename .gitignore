@@ -61,3 +61,6 @@ build/
 *.userosscache
 *.sln.docstates
 TestResults/
+
+# MacOS
+.DS_Store
