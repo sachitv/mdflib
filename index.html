@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+  <script>
+    var Module = {
+      onRuntimeInitialized: function() {
+        let etag = new Module.ETag();
+        etag.setName("Sachit");
+        let another_etag = new Module.ETag();
+        another_etag.setName("Inside");
+        etag.addTag(another_etag);
+        tree = etag.getTreeList();
+        for(let i = 0; i < tree.size(); ++i) {
+            console.log(tree.get(i).getName());
+        }
+
+        const Writer = new Module.Writer(Module.MdfWriterType.Mdf4Basic, "test_cpp.mf4");
+        const Header = Writer.getHeader();
+        Header.setAuthor("Caller");
+        Header.setDepartment("Home Alone");
+        Header.setDescription("Testing i");
+        Header.setProject("Mdf3WriteHD");
+        Header.setStartTime(BigInt(100000000));
+        Header.setSubject("PXY");
+
+        const History = Header.createFileHistory();
+        History.setTime(BigInt(1000000));
+        History.setDescription("Initial stuff");
+        History.setToolName("Unit Test");
+        History.setToolVendor("ACME");
+        History.setToolVersion("2.3");
+        History.setUserName("Ducky");
+
+        const dg = Writer.createDataGroup();
+        const cg = dg.createChannelGroup();
+        cg.setName("Test");
+        cg.setDescription("Test channel group");
+
+        const si = cg.createSourceInformation();
+        si.setName("SI-Name");
+        si.setPath("SI-Path");
+        si.setDescription("SI-Desc");
+        si.setType(Module.SourceType.Bus);
+        si.setBus(Module.BusType.Can);
+
+      
+        let cn = cg.createChannel();
+        cn.setName("Time");
+        cn.setDescription("Time channel");
+        cn.setType(Module.ChannelType.Master);
+        cn.setSync(Module.ChannelSyncType.Time);
+        cn.setDataType(Module.ChannelDataType.FloatLe);
+        cn.setDataBytes(BigInt(4));
+        cn.setUnit("s");
+        cn.setRange(0, 100);
+
+        cn = cg.createChannel();
+        cn.setName("SignedLe");
+        cn.setDescription("int32_t");
+        cn.setType(Module.ChannelType.FixedLength);
+        cn.setDataType(Module.ChannelDataType.SignedIntegerLe);
+        cn.setDataBytes(BigInt(4));
+
+        cn = cg.createChannel();
+        cn.setName("SignedBe");
+        cn.setDescription("int8_t");
+        cn.setType(Module.ChannelType.FixedLength);
+        cn.setDataType(Module.ChannelDataType.SignedIntegerLe);
+        cn.setDataBytes(BigInt(4));
+
+        cn = cg.createChannel();
+        cn.setName("FloatLe");
+        cn.setDescription("float");
+        cn.setType(Module.ChannelType.FixedLength);
+        cn.setDataType(Module.ChannelDataType.FloatLe);
+        cn.setDataBytes(BigInt(4));
+
+        cn = cg.createChannel();
+        cn.setName("FloatBe");
+        cn.setDescription("double");
+        cn.setType(Module.ChannelType.FixedLength);
+        cn.setDataType(Module.ChannelDataType.FloatBe);
+        cn.setDataBytes(BigInt(8));
+
+        cn = cg.createChannel();
+        cn.setName("String");
+        cn.setDescription("string");
+        cn.setType(Module.ChannelType.FixedLength);
+        cn.setDataType(Module.ChannelDataType.StringAscii);
+        cn.setDataBytes(BigInt(4));
+
+        cn = cg.createChannel();
+        cn.setName("ByteArray");
+        cn.setDescription("bytes");
+        cn.setType(Module.ChannelType.FixedLength);
+        cn.setDataType(Module.ChannelDataType.ByteArray);
+        cn.setDataBytes(BigInt(4));
+
+        const channels = cg.getChannels();
+        console.log("ChannelGroupGetChannels: " + channels.size());
+        Writer.initMeasurement();
+        Writer.startMeasurement(BigInt(100000000));
+        
+        console.log("Start measure");
+        for (let i = 0; i < 50; i++) {
+          channels.get(1).setChannelValueUint64(BigInt(i * 2), true);
+          channels.get(2).setChannelValueUint64(BigInt(i * 3), true);
+          channels.get(3).setChannelValueUint64(BigInt(i * 4), true);
+          channels.get(4).setChannelValueUint64(BigInt(i * 5), true);
+          channels.get(5).setChannelValueString(String(i * 6), true);
+
+          const bytesToWrite = String(i*6);
+          const vectorToWrite = new Module.Uint8Vector();
+          for(letter of bytesToWrite) {
+            vectorToWrite.push_back(6);
+          }
+
+          channels.get(6).setChannelValueVector(vectorToWrite, true);
+          Writer.saveSample(cg, BigInt(100000000 + i * 1000));
+          console.log("Save sample " + i)
+        }
+        console.log("Stop measure");
+        Writer.stopMeasurement(BigInt(1100000000));
+        Writer.finalizeMeasurement();
+    }
+  }
+  </script>
+  <script src="mdflibjs.js"></script>
+</html>
