@@ -27,6 +27,6 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} mdf)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    COMPILE_FLAGS "-sWASM_BIGINT"
-    LINK_FLAGS "-lembind"
+    COMPILE_FLAGS "-sWASM_BIGINT -pthread -sPTHREAD_POOL_SIZE=2"
+    LINK_FLAGS "-lembind -sWASM_BIGINT -pthread -sPTHREAD_POOL_SIZE=2"
 )

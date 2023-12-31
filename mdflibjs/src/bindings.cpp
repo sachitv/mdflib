@@ -39,7 +39,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
   using mdf::SyncType;
 
   // This is common for a lot of interfaces.
-  register_vector<uint8_t>("std::vector<uint8_t>");
+  register_vector<uint8_t>("Uint8Vector");
 
   // Bind the CanErrorType enum
   enum_<CanErrorType>("CanErrorType")
@@ -621,7 +621,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
       .function("createAttachment", &FileWrapped::CreateAttachment)
       .function("createDataGroup", &FileWrapped::CreateDataGroup);
 
-  class_<ReaderWrapped>("ReaderWrapped")
+  class_<ReaderWrapped>("Reader")
       .constructor<const std::string&>()
       .function("getIndex", &ReaderWrapped::GetIndex)
       .function("isOk", &ReaderWrapped::IsOk)
@@ -648,12 +648,7 @@ EMSCRIPTEN_BINDINGS(mdflibjs) {
       .value("Ethernet", MdfBusType::Ethernet)
       .value("UNKNOWN", MdfBusType::UNKNOWN);
 
-  enum_<MdfWriterType>("MdfWriterType")
-      .value("Mdf3Basic", MdfWriterType::Mdf3Basic)
-      .value("Mdf4Basic", MdfWriterType::Mdf4Basic)
-      .value("MdfBusLogger", MdfWriterType::MdfBusLogger);
-
-  class_<WriterWrapped>("WriterWrapped")
+  class_<WriterWrapped>("Writer")
       .constructor<mdf::MdfWriterType, const std::string&>()
       .function("getFile", &WriterWrapped::GetFile)
       .function("getHeader", &WriterWrapped::GetHeader)

@@ -118,6 +118,8 @@ target_include_directories(
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set_target_properties(mdf PROPERTIES COMPILE_FLAGS "-fPIC")
+else()
+  set_target_properties(mdf PROPERTIES COMPILE_FLAGS "-pthread" LINK_FLAGS "-pthread")
 endif()
 
 set(MDF_PUBLIC_HEADERS
