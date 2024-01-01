@@ -162,7 +162,7 @@
             const SourceInformation = ChannelGroup.getSourceInformation();
             console.log("SI Name: " + SourceInformation.getName());
             console.log("SI Path: " + SourceInformation.getPath());
-            console.log("SI Description: " + SourceInformation.getType());
+            console.log("SI Description: " + SourceInformation.getType().value);
             console.log("Nof Samples: " + ChannelGroup.getNofSamples());
 
             const Channels = ChannelGroup.getChannels();
@@ -172,9 +172,9 @@
               const Channel = Channels.get(j);
               console.log("Name: " + Channel.getName());
               console.log("Description: " + Channel.getDescription());
-              console.log("Type: " + Channel.getType());
-              console.log("Sync: " + Channel.getSync());
-              console.log("DataType: " + Channel.getDataType());
+              console.log("Type: " + Channel.getType().value);
+              console.log("Sync: " + Channel.getSync().value);
+              console.log("DataType: " + Channel.getDataType().value);
               console.log("DataBytes: " + Channel.getDataBytes());
               console.log("Unit: " + Channel.getUnit());
               console.log("");
