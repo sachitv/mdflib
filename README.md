@@ -54,24 +54,29 @@ The library and its applications, compiles/runs on Windows, Linux and Mac operat
 2. `cmake --build build`
 
 ##### Testing Emscripten
-1. Copy `/workspaces/mdflib/build/mdflibjs/mdflibjs.js` and `/workspaces/mdflib/build/mdflibjs/mdflibjs.wasm` to some other folder.
-2. Create an html file with the following contents:
+Note that you need [Node.js](https://nodejs.org/) installed for the same. I recommend using [NVM](https://github.com/nvm-sh/nvm).
+1. Create a temporary folder (let's call it `foo`) and copy [`build/mdflibjs/mdflibjs.js` and `build/mdflibjs/mdflibjs.wasm`](build/mdflibjs/index.html) [`build/mdflibjs/mdflibjs.js` and `build/mdflibjs/mdflibjs.wasm`](build/mdflibjs/mdflibjs.js) [`build/mdflibjs/mdflibjs.js` and `build/mdflibjs/mdflibjs.wasm`](build/mdflibjs/mdflibjs.wasm) [`build/mdflibjs/mdflibjs.js` and `build/mdflibjs/mdflibjs.wasm`](build/mdflibjs/mdflibjs.worker.js) to `foo/build`. 
+3. cd into the directory and `npm init` and then `npm install express`
+4. Create a file called index.js with the following contents:
+```js
+const express = require('express');
+const app = express();
 
-    ```html
-    <!doctype html>
-    <html>
-    <script>
-        var Module = {
-        onRuntimeInitialized: function() {
-            console.log('add result: ' + Module.add(1, 2));
-        }
-        };
-    </script>
-    <script src="mdflibjs.js"></script>
-    </html>
-    ```
-3. cd into the directory and run a Python web server `python3 -m http.server`
-4. Open the browser, open the console log developer tools and see the result there.
+app.use((_, res, next) => {
+  res.header('Cross-Origin-Opener-Policy', 'same-origin');
+  res.header('Cross-Origin-Embedder-Policy', 'require-corp');
+  next();
+});
+
+app.use(express.static('build'));
+
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}...`);
+});
+```
+4. Run `node index.js` and open the browser, open the console log developer tools and see the result there.
 
 ### Without Devcontainer
 
