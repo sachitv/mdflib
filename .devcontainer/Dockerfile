@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gdb \
     git \
+    gnupg \
     libtool \
     lldb \
     llvm \
@@ -33,6 +34,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     valgrind \
     zip \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+# Install Nodejs
+ENV NODE_MAJOR=20
+RUN sudo mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && \
+    apt-get install nodejs -y --no-install-recommends && \
+    apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables for vcpkg
 ENV VCPKG_ROOT=/usr/local/vcpkg \
