@@ -274,9 +274,20 @@
 
       WriteOperation();
       ReadOperation();
+
+      const worker = new Worker("worker.js");
+      const button = document.getElementById("my-button");
+      button.addEventListener("click", () => {
+        const file_chooser = document.getElementById("in-file");
+        const f = file_chooser.files[0];
+        worker.postMessage([f]);
+      });
     }
   }
 </script>
 <script src="mdflibjs.js"></script>
-
+<body>
+  <input type="file" id="in-file" />
+  <input type="button" id="my-button" value="ok" />
+</body>
 </html>

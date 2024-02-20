@@ -55,9 +55,16 @@ The library and its applications, compiles/runs on Windows, Linux and Mac operat
 
 ##### Testing Emscripten
 Note that you need [Node.js](https://nodejs.org/) installed for the same. I recommend using [NVM](https://github.com/nvm-sh/nvm).
-1. Create a temporary folder (let's call it `foo`) and copy [`build/mdflibjs/mdflibjs.js` and `build/mdflibjs/mdflibjs.wasm`](build/mdflibjs/index.html) [`build/mdflibjs/mdflibjs.js` and `build/mdflibjs/mdflibjs.wasm`](build/mdflibjs/mdflibjs.js) [`build/mdflibjs/mdflibjs.js` and `build/mdflibjs/mdflibjs.wasm`](build/mdflibjs/mdflibjs.wasm) [`build/mdflibjs/mdflibjs.js` and `build/mdflibjs/mdflibjs.wasm`](build/mdflibjs/mdflibjs.worker.js) to `foo/build`. 
-3. cd into the directory and `npm init` and then `npm install express`
-4. Create a file called index.js with the following contents:
+1. Create a temporary folder (let's call it `foo`) and copy the following files to `foo/build`.
+  ```txt
+  index.html
+  worker.js
+  build/mdflibjs/mdflibjs.js
+  build/mdflibjs/mdflibjs.wasm
+  build/mdflibjs/mdflibjs.worker.js
+  ```
+2. cd into `foo` and `npm init` and then `npm install express`
+3. Create a file called index.js with the following contents:
 ```js
 const express = require('express');
 const app = express();
